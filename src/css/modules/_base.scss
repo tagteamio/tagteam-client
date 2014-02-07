@@ -1,0 +1,28 @@
+* {
+	@include box-sizing(border-box);
+}
+
+body {
+	background: #fff;
+	color: #444;
+	font: $base-font-weight $font-size-base $base-font-family;
+	line-height: $base-line-height;
+}
+
+input {
+	&[type='email'],
+	&[type='password'],
+	&[type='text'] {
+		padding: 0 6px;
+		border: 1px solid #ccc;
+		border-radius: 2px;
+		box-shadow: inset 1px 1px 1px #fafafa;
+		background: #fff;
+		font-weight: inherit;
+		&:focus {
+			border-color: #aaa;
+			outline: 0;
+			background: #fbfbfb;
+		}
+	}
+}

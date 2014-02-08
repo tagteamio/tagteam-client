@@ -1,5 +1,6 @@
 {
 	"name": "root",
+	"slug": "",
 	"routes": {
 		"/": "index",
 		"/signup/": {

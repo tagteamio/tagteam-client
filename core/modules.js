@@ -50,7 +50,6 @@ var load = function(modulesPath){
 		controller = require(modulePath + '/controller');
 
 		forOwn(data.routes, function(verbs, route){
-			route = route == '/' && moduleName != 'root' ? '' : route;
 			if (isString(verbs)){
 				verbs = {get: verbs};
 			}
@@ -65,7 +64,7 @@ var load = function(modulesPath){
 					return;
 				}
 
-				fullRoute = (moduleName != 'root' ? '/' + moduleName : '') + route;
+				fullRoute = (data.slug !== '' ? '/' + data.slug : '') + route;
 				app[verb](fullRoute, controller[fnName]);
 			});
 		});

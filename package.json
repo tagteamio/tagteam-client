@@ -9,6 +9,7 @@
 	"main": "app.js",
 	"dependencies": {
 		"connect": "2.12",
+		"connect-slashes": "1.2",
 		"connect-redis": "1.4",
 		"consolidate": "0.9",
 		"express": "3.4",

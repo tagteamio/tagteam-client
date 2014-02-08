@@ -8,6 +8,7 @@ var app = express()
 	.set('view engine', 'html')
 	.set('views', __dirname + '/../views')
 	.use(express.static(__dirname + '/../public'))
+	.use(require('connect-slashes')())
 	.use(express.bodyParser())
 	.use(express.cookieParser())
 	.use(express.session({

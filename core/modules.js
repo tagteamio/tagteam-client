@@ -2,21 +2,9 @@
 
 var fs = require('fs'),
 	path = require('path'),
-	isString = require('mout/lang/isString'),
 	isFunction = require('mout/lang/isFunction'),
-	forOwn = require('mout/object/forOwn'),
 	app = require('./app');
 
-var requiredFiles = ['module.json', 'controller.js'];
-
-/**
- * Load modules from given directory
- *
- * It will apply each module's routes based on the specification found in
- * routes.json. It will also check if the methods that are referred to exist
- *
- * @param {String} modulesPath
- */
 var load = function(modulesPath){
 	modulesPath = path.normalize(modulesPath);
 	if (!fs.existsSync(modulesPath)){
@@ -26,51 +14,22 @@ var load = function(modulesPath){
 	var modules = fs.readdirSync(modulesPath);
 	if (!modules || !modules.length) return;
 
-	var modulePath, f, data, controller, fullRoute;
-	modules.forEach(function(moduleName){
+	var i, len = modules.length, moduleName, modulePath, router, mountPath;
+	for (i = 0; i < len; i++){
+		moduleName = modules[i];
 		modulePath = modulesPath + '/' + moduleName;
-		if (/^[_.]/.test(moduleName) ||
-			!fs.statSync(modulePath).isDirectory()) return;
+		if (
+			/^[_.]/.test(moduleName) ||
+			!fs.statSync(modulePath).isDirectory() ||
+			!fs.existsSync(modulePath + '/router.js')
+		) continue;
 
-		for (f = 0; f < requiredFiles.length; f++){
-			if (!fs.existsSync(modulePath + '/' + requiredFiles[f])){
-				console.log('Required file ' + requiredFiles[f] + ' missing for module ' + moduleName);
-				return;
-			}
-		}
+		router = require(modulePath + '/router');
+		if (!isFunction(router)) continue;
 
-		data = fs.readFileSync(modulePath + '/module.json');
-		try {
-			data = JSON.parse(data);
-		} catch(e){
-			console.log('Failed to parse routes for module ' + moduleName + ': ' + e.message);
-			return;
-		}
-
-		controller = require(modulePath + '/controller');
-
-		forOwn(data.routes, function(verbs, route){
-			if (isString(verbs)){
-				verbs = {get: verbs};
-			}
-
-			forOwn(verbs, function(fnName, verb){
-				if (!controller[fnName] || !isFunction(controller[fnName])){
-					console.log('Function `' + fnName + '` not found or invalid in `' + moduleName + '` controller');
-					return;
-				}
-				if (!/^(?:get|post|put|delete|head|patch|options)$/.test(verb)){
-					console.log('Invalid HTTP verb `' + verb + '` for route `' + route + '`');
-					return;
-				}
-
-				fullRoute = (data.slug !== '' ? '/' + data.slug : '') + route;
-				app[verb](fullRoute, controller[fnName]);
-			});
-		});
-	});
+		mountPath = '/' + (moduleName == 'root' ? '' : moduleName);
+		app.use(mountPath, router);
+	}
 };
 
-module.exports = {
-	load: load
-};
+load(process.cwd() + '/modules');

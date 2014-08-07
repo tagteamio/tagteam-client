@@ -27,15 +27,13 @@ router.route('/signup/')
 	})
 	.post(function(req, res){
 		if (!req.body.email || !req.body.password){
-			var locals = {
+			return res.render('signup', {
 				action: '/signup/',
 				error: 'Email or password missing'
-			};
-			res.render('signup', locals);
-			return;
+			});
 		}
 
-		res.json(501, {
+		res.status(501).json({
 			error: {
 				message: 'Not implemented yet'
 			}
@@ -63,7 +61,7 @@ router.route('/login/')
 			return;
 		}
 
-		res.json(501, {
+		res.status(501).json({
 			error: {
 				message: 'Not implemented yet'
 			}
